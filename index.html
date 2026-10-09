@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MockLens — iPhone Screenshot Frames &amp; Device Mockups</title>
+<meta name="description" content="Upload a screenshot and MockLens detects the exact Apple device by resolution, puts it in a realistic frame with every official color, and exports a high-res PNG — 100% in your browser.">
+<link rel="canonical" href="https://moclens.kuige.me/">
+<link rel="alternate" hreflang="en" href="https://moclens.kuige.me/">
+<link rel="alternate" hreflang="zh" href="https://moclens.kuige.me/?lang=zh">
+<link rel="alternate" hreflang="x-default" href="https://moclens.kuige.me/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MockLens">
+<meta property="og:title" content="MockLens — iPhone Screenshot Frames &amp; Device Mockups">
+<meta property="og:description" content="Auto-detect the Apple device from any screenshot resolution, drop it into a realistic frame, switch every official color, export high-res PNG. All local, no upload.">
+<meta property="og:url" content="https://moclens.kuige.me/">
+<meta property="og:image" content="https://moclens.kuige.me/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MockLens — iPhone Screenshot Frames &amp; Device Mockups">
+<meta name="twitter:description" content="Auto-detect the Apple device from any screenshot resolution, drop it into a realistic frame, switch every official color, export high-res PNG.">
+<meta name="twitter:image" content="https://moclens.kuige.me/og-image.png">
+<link rel="icon" type="image/png" href="favicon.png?v=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"MockLens","url":"https://moclens.kuige.me/","applicationCategory":"DesignApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Detect the Apple device from a screenshot's resolution, place it in a realistic device frame, switch every official color and export a high-res PNG — fully local in the browser.","featureList":"Apple device detection by screenshot resolution,iPhone/iPad/Apple Watch/MacBook frames,Official color switching,Transparent PNG export,100% client-side"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Which Apple devices does MockLens support?","acceptedAnswer":{"@type":"Answer","text":"About 30 device profiles: iPhone 5s through iPhone 17 Pro Max (including iPhone Air and the SE line), iPad mini through iPad Pro 13-inch, Apple Watch Series 3 through Ultra, and MacBook Air/Pro — each with its official colors."}},
+{"@type":"Question","name":"How does device detection work?","acceptedAnswer":{"@type":"Answer","text":"Every screenshot stores its pixel size, and every Apple display has a unique resolution. MockLens matches your image against a built-in resolution table entirely offline. An exact pixel match is certain; otherwise the closest aspect ratio is suggested and you can override it manually."}},
+{"@type":"Question","name":"Are my screenshots uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Upload, detection, rendering and export all run inside your browser. Nothing ever leaves your device — you can even disconnect from the network and keep using the tool."}},
+{"@type":"Question","name":"What resolution is the exported PNG?","acceptedAnswer":{"@type":"Answer","text":"By default the device's native screen resolution (for example 1320×2868 for iPhone 17 Pro Max), with an optional 2× export for retina workflows. Transparent backgrounds are supported."}},
+{"@type":"Question","name":"My screenshot was not detected — what now?","acceptedAnswer":{"@type":"Answer","text":"Cropped, resized or re-encoded screenshots lose their exact dimensions. Pick the device manually from the selector — frames, colors and export work exactly the same way."}}
+]}
+</script>
+<style>
+:root{--bg:#f5f5f7;--card:#ffffff;--ink:#1d1d1f;--sub:#6e6e73;--acc:#0071e3;--line:#e6e6eb;--stage:#eef0f4}
+html.dark{--bg:#000;--card:#161618;--ink:#f5f5f7;--sub:#86868b;--acc:#2997ff;--line:#2a2a2e;--stage:#0d0d0f}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--acc)}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+/* hero */
+.hero{padding:56px 0 8px;text-align:center}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.12;letter-spacing:-.02em;font-weight:700;margin:12px 0 14px}
+.sub{max-width:640px;margin:0 auto;color:var(--sub);font-size:17px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+.badge{font-size:12.5px;font-weight:600;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+/* app */
+.app{margin:34px 0 10px;display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
+@media(max-width:880px){.app{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px}
+.stage-card{min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:hidden}
+#drop{width:100%;border:2px dashed var(--line);border-radius:16px;padding:56px 24px;text-align:center;color:var(--sub);cursor:pointer;transition:border-color .15s,background .15s}
+#drop.on{border-color:var(--acc);background:rgba(0,113,227,.06)}
+#drop .big{font-size:19px;font-weight:600;color:var(--ink);margin-bottom:6px}
+#drop .hint{font-size:14px}
+#drop .models{font-size:12.5px;margin-top:14px;opacity:.75}
+#stage{display:none;max-width:100%;border-radius:14px}
+.btn{display:inline-flex;align-items:center;gap:7px;background:var(--acc);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:14.5px;font-weight:600;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--line)}
+.btn.small{padding:6px 13px;font-size:13px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lbl{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--sub);margin:16px 0 8px}
+.lbl:first-child{margin-top:0}
+#detBadge{display:none;font-size:13.5px;font-weight:600;border-radius:12px;padding:9px 12px;margin-bottom:14px}
+#detBadge.show{display:block}
+#detBadge.exact{background:rgba(48,209,88,.14);color:#1d8a3e}
+#detBadge.guess,#detBadge.manual{background:rgba(255,159,10,.15);color:#a4650a}
+#detBadge.none{background:rgba(255,69,58,.13);color:#c03a31}
+html.dark #detBadge.exact{color:#5ddb77}
+html.dark #detBadge.guess,html.dark #detBadge.manual{color:#ffc46b}
+html.dark #detBadge.none{color:#ff8f88}
+#detDims{font-weight:500;opacity:.75}
+select{width:100%;appearance:none;-webkit-appearance:none;background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:10px 34px 10px 12px;font-size:14.5px;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.sw{display:flex;flex-wrap:wrap;gap:9px}
+.swb{width:34px;height:34px;border-radius:50%;border:2px solid rgba(128,128,128,.28);cursor:pointer;position:relative;padding:0}
+.swb.sel{outline:2.5px solid var(--acc);outline-offset:2.5px}
+.swb.bg{border-radius:10px}
+.swb.tr{background-image:linear-gradient(45deg,#c9c9c9 25%,transparent 25%,transparent 75%,#c9c9c9 75%),linear-gradient(45deg,#c9c9c9 25%,transparent 25%,transparent 75%,#c9c9c9 75%);background-size:12px 12px;background-position:0 0,6px 6px;background-color:#fff}
+.ctl{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14.5px;padding:7px 0}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:none;background:transparent;color:var(--sub);padding:5px 13px;font-size:13px;font-weight:600}
+.seg button.sel{background:var(--acc);color:#fff}
+#exportRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+#exportRow .btn{flex:1;justify-content:center}
+/* features */
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0}
+@media(max-width:720px){.feat{grid-template-columns:1fr}}
+.feat .card h3{font-size:16.5px;margin-bottom:6px}
+.feat .card p{font-size:14px;color:var(--sub)}
+/* faq */
+details{border-bottom:1px solid var(--line);padding:14px 2px}
+details summary{cursor:pointer;font-weight:600;font-size:15.5px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";color:var(--sub);font-weight:400;flex:none}
+details[open] summary::after{content:"–"}
+details p{color:var(--sub);font-size:14.5px;margin-top:8px}
+.faq{max-width:760px;margin:30px auto 40px}
+.faq h2{font-size:26px;letter-spacing:-.01em;margin-bottom:10px;text-align:center}
+/* toast */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:9px 18px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:99}
+#toast.on{opacity:1;transform:translateX(-50%)}
+/* theme/lang buttons */
+.tbtn{background:transparent;border:1px solid var(--line);color:var(--sub);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+.tbtn:hover{color:var(--ink)}
+/* ── KuiGe 站群统一基座 ───────────────────── */
+:root{--kg-ink:#1f2430;--kg-sub:#6b7280;--kg-accent:#f2603c;--kg-line:#e8e6e1;--kg-bg:#faf9f7}
+.kg-top{position:sticky;top:0;z-index:60;background:rgba(250,249,247,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--kg-line)}
+.kg-top-in{max-width:1120px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.kg-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--kg-ink);font-weight:700;font-size:17px}
+.kg-brand img{width:32px;height:32px;border-radius:9px;display:block}
+.kg-brand small{font-weight:500;color:var(--kg-sub);font-size:12px}
+.kg-nav{display:flex;align-items:center;gap:14px;font-size:14px}
+.kg-nav a{color:var(--kg-sub);text-decoration:none}
+.kg-nav a:hover{color:var(--kg-ink)}
+.kg-entry{background:var(--kg-ink);color:#fff!important;padding:6px 14px;border-radius:999px;text-decoration:none;font-size:13px}
+.kg-entry:hover{background:var(--kg-accent)}
+.kg-foot{background:var(--kg-bg);border-top:1px solid var(--kg-line);color:var(--kg-sub);font-size:13px;margin-top:0}
+.kg-foot-in{max-width:1120px;margin:0 auto;padding:36px 20px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.kg-foot img{width:44px;height:44px;border-radius:12px;margin-bottom:2px}
+.kg-foot-brand{color:var(--kg-ink);font-weight:700;font-size:15px;margin:0}
+.kg-foot-links{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px}
+.kg-foot-links a{color:var(--kg-sub);text-decoration:none}
+.kg-foot-links a:hover{color:var(--kg-accent)}
+.kg-foot-copy{margin:4px 0 0;color:#9ca3af;font-size:12px}
+@media(max-width:640px){.kg-nav a:not(.kg-entry){display:none}}
+@media(max-width:480px){
+ .kg-brand small{display:none}
+ .kg-top-in{gap:10px;padding:10px 14px}
+ .kg-nav{gap:8px}
+ .kg-entry{font-size:0;padding:6px 11px}
+ .kg-entry::before{content:"🧩";font-size:13px}
+}
+@media(max-width:640px){.hero{padding-top:36px}.card{padding:14px;border-radius:16px}}
+</style>
+</head>
+<body>
+
+<header class="kg-top">
+  <div class="kg-top-in">
+    <a class="kg-brand" href="./">
+      <img src="favicon.png?v=1" alt="MockLens mascot">
+      <span>MockLens<small>Screenshot frames</small></span>
+    </a>
+    <nav class="kg-nav">
+      <button class="tbtn" id="langBtn" type="button">中文</button>
+      <button class="tbtn" id="themeBtn" type="button" aria-label="theme">🌗</button>
+      <a class="kg-entry" href="https://icongems.kuige.me/" target="_blank" rel="noopener">IconGems · 免费图标库</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow" data-i18n="eyebrow">Free · No signup · 100% local</div>
+    <h1 data-i18n="h1">Put Your Screenshots in an Apple Frame</h1>
+    <p class="sub" data-i18n="sub">Drop in any screenshot — MockLens reads its resolution, identifies the exact Apple device, drops it into a realistic frame and lets you switch every official color. Nothing is uploaded.</p>
+    <div class="badges">
+      <span class="badge" data-i18n="b1">No upload</span>
+      <span class="badge" data-i18n="b2">30 device profiles</span>
+      <span class="badge" data-i18n="b3">Every official color</span>
+      <span class="badge" data-i18n="b4">Transparent PNG export</span>
+    </div>
+  </section>
+
+  <section class="app">
+    <div class="card stage-card" id="stageCard">
+      <div id="drop" role="button" tabindex="0">
+        <div class="big" data-i18n="dropBig">Drop a screenshot here</div>
+        <div class="hint" data-i18n="dropHint">or click to browse · you can also paste with ⌘V / Ctrl+V</div>
+        <div class="models" data-i18n="dropModels">iPhone 5s → 17 Pro Max · iPad · Apple Watch · MacBook</div>
+      </div>
+      <canvas id="stage"></canvas>
+      <div class="row" id="stageActs" hidden>
+        <button class="btn ghost small" id="replaceBtn" type="button" data-i18n="replace">Replace image</button>
+        <button class="btn ghost small" id="demoBtn" type="button" data-i18n="demo">Try a sample</button>
+      </div>
+      <button class="btn" id="demoBtn0" type="button" data-i18n="demo">Try a sample</button>
+    </div>
+
+    <div class="card" id="ctlCard">
+      <div id="detBadge"><span id="detText"></span> <span id="detDims"></span></div>
+      <div class="lbl" data-i18n="lDevice">Device</div>
+      <select id="devSel"></select>
+      <div class="lbl" data-i18n="lColor">Color</div>
+      <div class="sw" id="colSw"></div>
+      <div class="lbl" data-i18n="lBg">Background</div>
+      <div class="sw" id="bgSw"></div>
+      <div class="lbl" data-i18n="lOptions">Options</div>
+      <div class="ctl"><span data-i18n="oShadow">Drop shadow</span><input type="checkbox" id="shadowCk" checked></div>
+      <div class="ctl"><span data-i18n="oScale">Export size</span>
+        <span class="seg" id="scaleSeg"><button type="button" data-s="1" class="sel">1×</button><button type="button" data-s="2">2×</button></span>
+      </div>
+      <div id="exportRow">
+        <button class="btn" id="dlBtn" type="button" data-i18n="download">Download PNG</button>
+        <button class="btn ghost" id="cpBtn" type="button" data-i18n="copy">Copy image</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="feat">
+    <div class="card"><h3 data-i18n="f1t">Resolution-accurate detection</h3><p data-i18n="f1p">Every Apple display has a unique pixel size. MockLens matches your screenshot against a built-in table — from iPhone 5s to iPhone 17 Pro Max, iPad, Apple Watch and MacBook.</p></div>
+    <div class="card"><h3 data-i18n="f2t">Every official color</h3><p data-i18n="f2p">Titanium, aluminum, glass — each device renders with its full official palette, from Cosmic Orange to Desert Titanium. Switching a color is instant.</p></div>
+    <div class="card"><h3 data-i18n="f3t">Private by design</h3><p data-i18n="f3p">There is no server. Your screenshot never leaves the browser: detection, framing and export all happen on your device — even offline.</p></div>
+  </section>
+
+  <section class="faq" id="faq">
+    <h2 data-i18n="faqT">FAQ</h2>
+    <details open><summary data-i18n="q1">Which Apple devices does MockLens support?</summary><p data-i18n="a1">About 30 device profiles: iPhone 5s through iPhone 17 Pro Max (including iPhone Air and the SE line), iPad mini through iPad Pro 13″, Apple Watch Series 3 through Ultra, and MacBook Air/Pro — each with its official colors.</p></details>
+    <details><summary data-i18n="q2">How does device detection work?</summary><p data-i18n="a2">Every screenshot stores its pixel size, and every Apple display has a unique resolution. MockLens matches your image against this built-in table entirely offline. An exact pixel match is certain; otherwise the closest aspect ratio is suggested and you can always override it.</p></details>
+    <details><summary data-i18n="q3">Are my screenshots uploaded anywhere?</summary><p data-i18n="a3">No. Upload, detection, rendering and export all run inside your browser. Nothing ever leaves your device — you can even disconnect from the network and keep using the tool.</p></details>
+    <details><summary data-i18n="q4">What resolution is the exported PNG?</summary><p data-i18n="a4">By default the device’s native screen resolution (for example 1320 × 2868 for iPhone 17 Pro Max), with an optional 2× export for retina workflows. Transparent backgrounds are supported.</p></details>
+    <details><summary data-i18n="q5">My screenshot was not detected — what now?</summary><p data-i18n="a5">Cropped, resized or re-encoded screenshots lose their exact dimensions. Pick the device manually from the selector — frames, colors and export work exactly the same way.</p></details>
+  </section>
+</main>
+
+<footer class="kg-foot">
+  <div class="kg-foot-in">
+    <img src="favicon.png?v=1" alt="MockLens mascot">
+    <p class="kg-foot-brand">MockLens</p>
+    <nav class="kg-foot-links">
+      <a href="https://kuige.me/" target="_blank" rel="noopener">魁歌主页</a>
+      <a href="https://icongems.kuige.me/" target="_blank" rel="noopener">IconGems</a>
+      <a href="https://shareforge.kuige.me/" target="_blank" rel="noopener">ShareForge</a>
+      <a href="https://picsqueeze.kuige.me/" target="_blank" rel="noopener">PicSqueeze</a>
+      <a href="https://rednote-formatter.kuige.me/" target="_blank" rel="noopener">Rednote Formatter</a>
+    </nav>
+    <p class="kg-foot-copy">© 2026 魁歌 KuiGe · 用 AI 构建 · <a href="https://kuige.me/" style="color:inherit">kuige.me</a></p>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<!-- 矩阵导流：完成点推荐（独立脚本，不依赖站点 JS） -->
+<script>
+(function(){
+  var F={key:'funnel_moclens_shareforge_v1',url:'https://shareforge.kuige.me/?from=moclens',
+    zh:{title:'做张分享图？',why:'带壳截图已完成，配上文案和模板直接发社交平台',btn:'打开 ShareForge'},
+    en:{title:'Make a share card?',why:'Your framed screenshot is ready — add copy and a template for social',btn:'Open ShareForge'}};
+  var st=document.createElement('style');
+  st.textContent='.mxf{position:fixed;right:18px;bottom:18px;z-index:80;max-width:320px;background:#1f2430;color:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 12px 34px rgba(0,0,0,.28);font-size:14px}.mxf h4{margin:0 0 4px;font-size:15px}.mxf p{margin:0 0 10px;opacity:.75;font-size:13px}.mxf a{display:inline-block;background:#f2603c;color:#fff;text-decoration:none;border-radius:999px;padding:6px 14px;font-weight:600;font-size:13px}.mxf .mxc{position:absolute;top:8px;right:10px;background:none;border:none;color:#fff;opacity:.6;font-size:15px;cursor:pointer}';
+  document.head.appendChild(st);
+  window.mxFunnel=function(){
+    try{
+      if(sessionStorage.getItem(F.key))return;
+      var L=(document.documentElement.lang||'en').indexOf('zh')===0?F.zh:F.en;
+      var d=document.createElement('div');d.className='mxf';
+      d.innerHTML='<button class="mxc" aria-label="close">✕</button><h4></h4><p></p><a> </a>';
+      d.querySelector('h4').textContent=L.title;
+      d.querySelector('p').textContent=L.why;
+      var a=d.querySelector('a');a.textContent=L.btn;a.href=F.url;a.target='_blank';a.rel='noopener';
+      function close(){sessionStorage.setItem(F.key,'1');d.remove();}
+      d.querySelector('.mxc').addEventListener('click',close);
+      document.body.appendChild(d);
+      setTimeout(function(){if(d.parentNode)close();},22000);
+    }catch(e){}
+  };
+})();
+</script>
+
+<script type="module">
+/* ============================ MockLens engine ============================ */
+const $=id=>document.getElementById(id);
+
+/* ---------- i18n ---------- */
+const DICT={
+en:{
+ title:'MockLens — iPhone Screenshot Frames & Device Mockups',
+ eyebrow:'Free · No signup · 100% local',
+ h1:'Put Your Screenshots in an Apple Frame',
+ sub:'Drop in any screenshot — MockLens reads its resolution, identifies the exact Apple device, drops it into a realistic frame and lets you switch every official color. Nothing is uploaded.',
+ b1:'No upload',b2:'30 device profiles',b3:'Every official color',b4:'Transparent PNG export',
+ dropBig:'Drop a screenshot here',dropHint:'or click to browse · you can also paste with ⌘V / Ctrl+V',
+ dropModels:'iPhone 5s → 17 Pro Max · iPad · Apple Watch · MacBook',
+ replace:'Replace image',demo:'Try a sample',
+ lDevice:'Device',lColor:'Color',lBg:'Background',lOptions:'Options',
+ oShadow:'Drop shadow',oScale:'Export size',download:'Download PNG',copy:'Copy image',
+ detExact:'Detected',detGuess:'Likely',detNone:'Not recognized — pick manually',detManual:'Selected',
+ f1t:'Resolution-accurate detection',f1p:'Every Apple display has a unique pixel size. MockLens matches your screenshot against a built-in table — from iPhone 5s to iPhone 17 Pro Max, iPad, Apple Watch and MacBook.',
+ f2t:'Every official color',f2p:'Titanium, aluminum, glass — each device renders with its full official palette, from Cosmic Orange to Desert Titanium. Switching a color is instant.',
+ f3t:'Private by design',f3p:'There is no server. Your screenshot never leaves the browser: detection, framing and export all happen on your device — even offline.',
+ faqT:'FAQ',
+ q1:'Which Apple devices does MockLens support?',
+ a1:'About 30 device profiles: iPhone 5s through iPhone 17 Pro Max (including iPhone Air and the SE line), iPad mini through iPad Pro 13″, Apple Watch Series 3 through Ultra, and MacBook Air/Pro — each with its official colors.',
+ q2:'How does device detection work?',
+ a2:'Every screenshot stores its pixel size, and every Apple display has a unique resolution. MockLens matches your image against this built-in table entirely offline. An exact pixel match is certain; otherwise the closest aspect ratio is suggested and you can always override it.',
+ q3:'Are my screenshots uploaded anywhere?',
+ a3:'No. Upload, detection, rendering and export all run inside your browser. Nothing ever leaves your device — you can even disconnect from the network and keep using the tool.',
+ q4:'What resolution is the exported PNG?',
+ a4:'By default the device’s native screen resolution (for example 1320 × 2868 for iPhone 17 Pro Max), with an optional 2× export for retina workflows. Transparent backgrounds are supported.',
+ q5:'My screenshot was not detected — what now?',
+ a5:'Cropped, resized or re-encoded screenshots lose their exact dimensions. Pick the device manually from the selector — frames, colors and export work exactly the same way.',
+ toastCopied:'Copied to clipboard ✓',toastCopyFail:'Copy failed — use Download instead',toastLoaded:'Image loaded',toastBadImg:'Could not decode this image — try PNG or JPG',
+ px:'px'
+},
+zh:{
+ title:'MockLens — 带壳截图 · 苹果设备样机生成',
+ eyebrow:'免费 · 免注册 · 纯本地',
+ h1:'把截图装进苹果手机的壳里',
+ sub:'拖入任意截图 —— MockLens 读取分辨率、识别确切机型、套入逼真机壳，并可切换全部官方配色。全程不上传。',
+ b1:'不上传',b2:'30 个机型档案',b3:'全部官方配色',b4:'透明底 PNG 导出',
+ dropBig:'把截图拖到这里',dropHint:'或点击选择 · 也可以直接 ⌘V / Ctrl+V 粘贴',
+ dropModels:'iPhone 5s → 17 Pro Max · iPad · Apple Watch · MacBook',
+ replace:'换一张图',demo:'试试示例截图',
+ lDevice:'机型',lColor:'配色',lBg:'背景',lOptions:'选项',
+ oShadow:'投影',oScale:'导出尺寸',download:'下载 PNG',copy:'复制图片',
+ detExact:'识别成功',detGuess:'疑似机型',detNone:'未能识别 — 请手动选择',detManual:'已选择',
+ f1t:'按分辨率精确识别',f1p:'每块苹果屏幕都有独一无二的像素尺寸。MockLens 对照内置分辨率表识别截图——从 iPhone 5s 到 iPhone 17 Pro Max、iPad、Apple Watch 与 MacBook。',
+ f2t:'全部官方配色',f2p:'钛金属、铝金属、玻璃——每台设备都以完整官方配色渲染，从宇宙橙到沙漠钛。切换颜色即时生效。',
+ f3t:'隐私优先',f3p:'没有服务器。截图从不离开浏览器：识别、套壳、导出全部在你的设备上完成——断网也能用。',
+ faqT:'常见问题',
+ q1:'MockLens 支持哪些苹果设备？',
+ a1:'约 30 个机型档案：iPhone 5s 到 iPhone 17 Pro Max（含 iPhone Air 与 SE 系列）、iPad mini 到 iPad Pro 13″、Apple Watch Series 3 到 Ultra，以及 MacBook Air/Pro——每台都带官方配色。',
+ q2:'机型识别是怎么工作的？',
+ a2:'每张截图都记录了像素尺寸，而每块苹果屏幕的分辨率都独一无二。MockLens 纯离线地对照内置分辨率表匹配：像素完全一致即为确定；否则给出最接近的宽高比建议，随时可以手动改。',
+ q3:'我的截图会被上传吗？',
+ a3:'不会。上传、识别、渲染、导出全部在浏览器里完成，任何数据都不离开你的设备——断网也照常可用。',
+ q4:'导出的 PNG 是什么分辨率？',
+ a4:'默认是设备的原生屏幕分辨率（例如 iPhone 17 Pro Max 为 1320 × 2868），可选 2× 导出适配视网膜工作流，并支持透明底。',
+ q5:'截图没有被识别怎么办？',
+ a5:'裁剪、缩放或转存过的截图会丢失原始尺寸。直接在选单里手动挑机型——机壳、配色和导出功能完全一样。'
+}};
+
+/* ---------- device database (logical screen pt + native px + official colors) ---------- */
+const C=(en,zh,c)=>({en,zh,c});
+const TITANIUM16=[
+ C('Black Titanium','黑色钛金属','#3a3a3d'),C('White Titanium','白色钛金属','#e4e2db'),
+ C('Natural Titanium','原色钛金属','#b8b2a7'),C('Desert Titanium','沙漠色钛金属','#c8a882'),
+ C('Cosmic Orange','宇宙橙','#e0602c'),C('Deep Blue','深蓝色','#3e4a63'),C('Silver','银色','#e9e7e2')];
+const PALETTE15=[
+ C('Black','黑色','#3f3f42'),C('White','白色','#f2f0ea'),C('Pink','粉色','#efc8ce'),
+ C('Teal','青绿色','#a9cec6'),C('Ultramarine','群青色','#6e85c7'),
+ C('Blue Titanium','蓝色钛金属','#414d62'),C('White Titanium','白色钛金属','#e4e2db'),
+ C('Natural Titanium','原色钛金属','#b8b2a7'),C('Deep Purple','暗紫色','#4c3f5e'),C('Gold','金色','#e5d3a9')];
+const PALETTE14=[
+ C('Midnight','午夜色','#232b38'),C('Starlight','星光色','#ede9de'),C('Blue','蓝色','#a8c3dc'),
+ C('Purple','紫色','#cbc1e3'),C('Red','红色','#be3a3f'),C('Green','绿色','#b3c9b1'),
+ C('Yellow','黄色','#f2e3a1'),C('Pink','粉色','#efbfc8'),C('Sierra Blue','远峰蓝色','#a7bccf'),
+ C('Graphite','石墨色','#4a4f55'),C('Silver','银色','#e6e6e4'),C('Gold','金色','#eadfc6')];
+const PALETTE11=[
+ C('Black','黑色','#3b3b3d'),C('Product Red','红色','#ba0c2e'),C('Yellow','黄色','#f5e39c'),
+ C('White','白色','#f9f6ef'),C('Green','绿色','#aee1cd'),C('Purple','紫色','#d1c3e9'),
+ C('Blue','蓝色','#afc6e4'),C('Coral','珊瑚色','#f1664c')];
+const CLASSIC=[
+ C('Gold','金色','#e7d3a5'),C('Silver','银色','#e8e8ea'),C('Space Gray','深空灰色','#454549'),
+ C('Product Red','红色','#c4383e'),C('Rose Gold','玫瑰金色','#ebc0bb'),C('Jet Black','亮黑色','#1c1c1e')];
+const PADCOLS=[
+ C('Silver','银色','#e4e4e6'),C('Space Gray','深空灰色','#545458'),C('Starlight','星光色','#ede7db'),
+ C('Blue','蓝色','#7d98c1'),C('Purple','紫色','#c6bce3'),C('Pink','粉色','#f2cdd4'),C('Space Black','深空黑色','#3b3b3e')];
+const WATCHCOLS=[
+ C('Midnight','午夜色','#2e3641'),C('Starlight','星光色','#ede9de'),C('Silver','银色','#e5e5e7'),
+ C('Jet Black','亮黑色','#1e1e20'),C('Rose Gold','玫瑰金色','#e8c1b4'),C('Red','红色','#c4383e'),
+ C('Natural Titanium','原色钛金属','#d5d0c7'),C('Slate','石板色','#4a4a4e')];
+const MACCOLS=[
+ C('Silver','银色','#e3e4e6'),C('Space Gray','深空灰色','#4c4c50'),C('Space Black','深空黑色','#2e2e30'),
+ C('Midnight','午夜色','#2e3641'),C('Starlight','星光色','#ede9de')];
+
+const DEVICES=[
+ // iPhone — sw/sh are logical points; px is the native screenshot size
+ {id:'ip17pm',cat:'iphone',name:'iPhone 17 Pro Max / 16 Pro Max',sw:440,sh:956,px:[1320,2868],frame:'island',colors:TITANIUM16},
+ {id:'ip17',cat:'iphone',name:'iPhone 17 Pro / 17 / 16 Pro',sw:402,sh:874,px:[1206,2622],frame:'island',colors:TITANIUM16},
+ {id:'ipair',cat:'iphone',name:'iPhone Air',sw:420,sh:912,px:[1260,2736],frame:'island',
+  colors:[C('Space Black','深空黑色','#2f2d31'),C('Cloud White','云朵白','#eae8e3'),C('Light Gold','浅金色','#ebdcc2'),C('Sky Blue','天空蓝','#afc8da')]},
+ {id:'ip16',cat:'iphone',name:'iPhone 16 / 15 / 15 Pro / 14 Pro',sw:393,sh:852,px:[1179,2556],frame:'island',colors:PALETTE15},
+ {id:'ip16p',cat:'iphone',name:'iPhone 16 Plus / 15 Plus / 15 Pro Max / 14 Pro Max',sw:430,sh:932,px:[1290,2796],frame:'island',colors:PALETTE15},
+ {id:'ip14',cat:'iphone',name:'iPhone 14 / 13 / 13 Pro / 12 Pro / 12',sw:390,sh:844,px:[1170,2532],frame:'island',colors:PALETTE14},
+ {id:'ipmini',cat:'iphone',name:'iPhone 13 mini / 12 mini',sw:375,sh:812,px:[1080,2340],frame:'island',
+  colors:[C('Midnight','午夜色','#232b38'),C('Starlight','星光色','#ede9de'),C('Blue','蓝色','#a8c3dc'),C('Pink','粉色','#efbfc8'),C('Red','红色','#be3a3f'),C('Green','绿色','#b3c9b1'),C('White','白色','#f5f4ef'),C('Black','黑色','#3b3b3d'),C('Purple','紫色','#cbc1e3')]},
+ {id:'ip11p',cat:'iphone',name:'iPhone 11 Pro Max / XS Max',sw:414,sh:896,px:[1242,2688],frame:'notch',
+  colors:[C('Space Gray','深空灰色','#434347'),C('Silver','银色','#e5e5e7'),C('Gold','金色','#eadfc6'),C('Midnight Green','暗夜绿色','#4e5851')]},
+ {id:'ip11pro',cat:'iphone',name:'iPhone 11 Pro / XS / X',sw:375,sh:812,px:[1125,2436],frame:'notch',
+  colors:[C('Space Gray','深空灰色','#434347'),C('Silver','银色','#e5e5e7'),C('Gold','金色','#eadfc6'),C('Midnight Green','暗夜绿色','#4e5851')]},
+ {id:'ip11',cat:'iphone',name:'iPhone 11 / XR',sw:414,sh:896,px:[828,1792],frame:'notch',colors:PALETTE11},
+ {id:'ip8',cat:'iphone',name:'iPhone 8 / 7 / 6s / 6 / SE (2nd & 3rd gen)',sw:375,sh:667,px:[750,1334],frame:'home',colors:CLASSIC},
+ {id:'ip8p',cat:'iphone',name:'iPhone 8 Plus / 7 Plus / 6s Plus',sw:414,sh:736,px:[1080,1920],altPx:[1242,2208],frame:'homeplus',colors:CLASSIC},
+ {id:'ipse',cat:'iphone',name:'iPhone SE (1st gen) / 5s / 5 / 5c',sw:320,sh:568,px:[640,1136],frame:'se',
+  colors:[C('Silver','银色','#e8e8ea'),C('Gold','金色','#e7d3a5'),C('Space Gray','深空灰色','#454549'),C('Blue','蓝色','#a7c6e8'),C('Green','绿色','#b8dcb4'),C('Yellow','黄色','#f5e39c'),C('Pink','粉色','#f2b8c6'),C('White','白色','#f7f5f0')]},
+ // iPad
+ {id:'pad13',cat:'ipad',name:'iPad Pro 13″ (M4)',sw:1032,sh:1376,px:[2064,2752],frame:'padmodern',colors:[C('Silver','银色','#e4e4e6'),C('Space Black','深空黑色','#3b3b3e')]},
+ {id:'pad11m4',cat:'ipad',name:'iPad Pro 11″ (M4)',sw:834,sh:1210,px:[1668,2420],frame:'padmodern',colors:[C('Silver','银色','#e4e4e6'),C('Space Black','深空黑色','#3b3b3e')]},
+ {id:'pad129',cat:'ipad',name:'iPad Pro 12.9″ (1st–6th gen)',sw:1024,sh:1366,px:[2048,2732],frame:'padhome',colors:[C('Silver','银色','#e4e4e6'),C('Space Gray','深空灰色','#545458')]},
+ {id:'pad11',cat:'ipad',name:'iPad Pro 11″ (1st–4th gen) / Air 11″ (M2/M3)',sw:834,sh:1194,px:[1668,2388],frame:'padhome',colors:PADCOLS},
+ {id:'padair',cat:'ipad',name:'iPad Air 10.9″ / iPad 10th–11th gen',sw:820,sh:1180,px:[1640,2360],frame:'padhome',colors:PADCOLS},
+ {id:'pad105',cat:'ipad',name:'iPad Pro 10.5″ / iPad Air 3',sw:834,sh:1112,px:[1668,2224],frame:'padhome',colors:[C('Silver','银色','#e4e4e6'),C('Space Gray','深空灰色','#545458'),C('Gold','金色','#eadfc6'),C('Rose Gold','玫瑰金色','#ebc0bb')]},
+ {id:'pad102',cat:'ipad',name:'iPad 10.2″ (7th–9th gen)',sw:810,sh:1080,px:[1620,2160],frame:'padhome',colors:[C('Silver','银色','#e4e4e6'),C('Space Gray','深空灰色','#545458'),C('Starlight','星光色','#ede7db')]},
+ {id:'pad97',cat:'ipad',name:'iPad 9.7″ / Air 1–2 / iPad mini 4',sw:768,sh:1024,px:[1536,2048],frame:'padhome',colors:[C('Silver','银色','#e4e4e6'),C('Space Gray','深空灰色','#545458'),C('Gold','金色','#eadfc6'),C('Rose Gold','玫瑰金色','#ebc0bb')]},
+ {id:'padmini',cat:'ipad',name:'iPad mini 6 / 7 (8.3″)',sw:744,sh:1133,px:[1488,2266],frame:'padhome',colors:PADCOLS},
+ // Watch — screenshots are already 1× pixels; used as pt directly
+ {id:'wultra',cat:'watch',name:'Apple Watch Ultra (49mm)',px:[410,502],frame:'watch',colors:[C('Natural Titanium','原色钛金属','#d5d0c7'),C('Black Titanium','黑色钛金属','#3a3a3c')]},
+ {id:'w46',cat:'watch',name:'Apple Watch Series 10/11 (46mm)',px:[416,496],frame:'watch',colors:WATCHCOLS},
+ {id:'w42',cat:'watch',name:'Apple Watch Series 10/11 (42mm)',px:[374,446],frame:'watch',colors:WATCHCOLS},
+ {id:'w45',cat:'watch',name:'Apple Watch Series 7/8/9 (45mm)',px:[396,484],frame:'watch',colors:WATCHCOLS},
+ {id:'w41',cat:'watch',name:'Apple Watch Series 7/8/9 (41mm)',px:[352,430],frame:'watch',colors:WATCHCOLS},
+ {id:'w44',cat:'watch',name:'Apple Watch Series 4/5/6/SE (44mm)',px:[368,448],frame:'watch',colors:[C('Space Gray','深空灰色','#454549'),C('Silver','银色','#e5e5e7'),C('Gold','金色','#eadfc6'),C('Blue','蓝色','#7d98c1'),C('Red','红色','#c4383e')]},
+ {id:'w40',cat:'watch',name:'Apple Watch Series 4/5/6/SE (40mm)',px:[324,394],frame:'watch',colors:[C('Space Gray','深空灰色','#454549'),C('Silver','银色','#e5e5e7'),C('Gold','金色','#eadfc6'),C('Blue','蓝色','#7d98c1'),C('Red','红色','#c4383e')]},
+ {id:'w3',cat:'watch',name:'Apple Watch Series 3',px:[312,390],frame:'watch',colors:[C('Space Gray','深空灰色','#454549'),C('Silver','银色','#e5e5e7'),C('Gold','金色','#eadfc6')]},
+ // Mac — px stored portrait-normalized [min,max]; frames render landscape
+ {id:'mbp16',cat:'mac',name:'MacBook Pro 16″',sw:1728,sh:1117,px:[2234,3456],frame:'mac',colors:MACCOLS},
+ {id:'mbp14',cat:'mac',name:'MacBook Pro 14″',sw:1512,sh:982,px:[1964,3024],frame:'mac',colors:MACCOLS},
+ {id:'mba15',cat:'mac',name:'MacBook Air 15″',sw:1440,sh:932,px:[1864,2880],frame:'mac',colors:MACCOLS},
+ {id:'mba13',cat:'mac',name:'MacBook Air 13″ (M2+)',sw:1280,sh:832,px:[1664,2560],frame:'mac',colors:MACCOLS},
+];
+const BYID=Object.fromEntries(DEVICES.map(d=>[d.id,d]));
+const HOME_FRAMES=['home','homeplus','se'];
+
+/* ---------- color helpers ---------- */
+function hex2rgb(h){const n=parseInt(h.slice(1),16);return[n>>16&255,n>>8&255,n&255];}
+function shade(h,amt){const[r,g,b]=hex2rgb(h);const f=v=>Math.max(0,Math.min(255,Math.round(amt>0?v+(255-v)*amt:v*(1+amt))));return`rgb(${f(r)},${f(g)},${f(b)})`;}
+function rgba(h,a){const[r,g,b]=hex2rgb(h);return`rgba(${r},${g},${b},${a})`;}
+
+/* ---------- state ---------- */
+const BGS=[
+ {id:'transparent',c:null},
+ {id:'white',c:'#ffffff'},{id:'ink',c:'#101013'},{id:'apple',c:'#f5f5f7'},
+ {id:'gblue',grad:['#0a84ff','#5e5ce6']},{id:'gsunset',grad:['#ff375f','#ff9f0a']},
+ {id:'gmint',grad:['#30d158','#64d2ff']},{id:'ggraphite',grad:['#3a3a3c','#141416']}];
+const state={dev:BYID.ip17,ci:0,bg:'transparent',shadow:true,scale:1,img:null,iw:0,ih:0,landscape:false,conf:null};
+let LANG='en';
+
+/* ---------- i18n ---------- */
+function t(k){return DICT[LANG][k]??DICT.en[k]??k;}
+function applyLang(){
+ document.documentElement.lang=LANG;
+ document.title=t('title');
+ document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
+ $('langBtn').textContent=LANG==='en'?'中文':'EN';
+ renderBadge();buildSwatches();
+ history.replaceState(null,'',LANG==='zh'?location.pathname+'?lang=zh':location.pathname);
+}
+
+/* ---------- detection ---------- */
+function detect(w,h){
+ const pw=Math.min(w,h),ph=Math.max(w,h),land=w>h,ratio=ph/pw;
+ // 1) exact pixel match (±3px, tolerates re-encodes)
+ let best=null,bestScore=null;
+ for(const d of DEVICES){
+   if(d.cat==='mac'&&!land)continue;              // Mac frames are landscape-native
+   const cands=d.altPx?[d.px,d.altPx]:[d.px];
+   for(const p of cands){
+     const dw=Math.abs(p[0]-pw),dh=Math.abs(p[1]-ph);
+     if(dw<=3&&dh<=3&&(bestScore===null||dw+dh<bestScore)){best=d;bestScore=dw+dh;}
+   }
+ }
+ if(best)return{dev:best,conf:'exact'};
+ // 2) aspect-ratio fallback (orientation-aware; pixel proximity breaks near-ties)
+ let guess=null,gs=Infinity;
+ for(const d of DEVICES){
+   const dsw=d.sw||d.px[0],dsh=d.sh||d.px[1];
+   if((d.cat==='mac')!==land)continue;
+   const ratioDelta=Math.abs(dsh/dsw-ratio)/ratio;
+   const pxPenalty=.3*Math.abs(d.px[0]-pw)/pw;
+   const score=ratioDelta+pxPenalty;
+   if(ratioDelta<.014&&score<gs){guess=d;gs=score;}
+ }
+ if(guess)return{dev:guess,conf:'guess'};
+ // 3) any wide landscape → suggest a MacBook frame
+ if(land&&ratio>1.3&&ratio<1.8)return{dev:BYID.mbp16,conf:'guess'};
+ return{dev:null,conf:'none'};
+}
+
+/* ---------- geometry per frame type (pt units) ---------- */
+function geom(d){
+ const sw=d.sw||d.px[0],sh=d.sh||d.px[1];
+ const f=d.frame;
+ if(f==='island'){const bezel=.024*sw,sr=.138*sw;
+   return{sw,sh,bezel,sr,br:sr+bezel,island:true,pillW:.30*sw,pillH:.092*sw,pillTop:.0125*sh};}
+ if(f==='notch'){const bezel=.028*sw,sr=.112*sw;
+   return{sw,sh,bezel,sr,br:sr+bezel,notch:true,notchW:.545*sw,notchH:.037*sh};}
+ if(f==='home'){return{sw,sh,bezel:.058*sw,sr:.055*sw,br:.062*sw,top:.078*sh,bottom:.078*sh,homeBtn:.117*sw,ear:.30*sw};}
+ if(f==='homeplus'){return{sw,sh,bezel:.048*sw,sr:.052*sw,br:.056*sw,top:.071*sh,bottom:.071*sh,homeBtn:.107*sw,ear:.28*sw};}
+ if(f==='se'){return{sw,sh,bezel:.056*sw,sr:.052*sw,br:.072*sw,top:.096*sh,bottom:.096*sh,homeBtn:.137*sw,ear:.34*sw};}
+ if(f==='padhome'){return{sw,sh,bezel:.028*sw,sr:.030*sw,br:.045*sw,homeBtn:.045*sw,cam:.010*sw};}
+ if(f==='padmodern'){return{sw,sh,bezel:.024*sw,sr:.022*sw,br:.040*sw,cam:.009*sw};}
+ if(f==='watch'){return{sw,sh,bezel:.022*sw,sr:.155*sw,br:.175*sw};}
+ if(f==='mac'){return{sw,sh,bezel:.014*sw,sr:.018*sw,br:.024*sw,deck:.034*sw,deckExt:.075*sw,notchW:.102*sw,notchH:.030*sh};}
+ return{sw,sh,bezel:.03*sw,sr:.1*sw,br:.12*sw};
+}
+function bodySize(d){
+ const g=geom(d);
+ return HOME_FRAMES.includes(d.frame)?[g.sw+g.bezel*2,g.sh+g.top+g.bottom]:[g.sw+g.bezel*2,g.sh+g.bezel*2];
+}
+
+/* ---------- canvas helpers ---------- */
+function rr(ctx,x,y,w,h,r){
+ r=Math.max(1,Math.min(r,w/2,h/2));
+ ctx.beginPath();
+ ctx.moveTo(x+r,y);
+ ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+ ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);
+ ctx.closePath();
+}
+function coverRect(iw,ih,dw,dh){
+ const ir=iw/ih,dr=dw/dh;
+ if(Math.abs(ir-dr)<1e-4)return[0,0,iw,ih];
+ let sw,sh;
+ if(ir>dr){sh=ih;sw=ih*dr;}else{sw=iw;sh=iw/dr;}
+ return[(iw-sw)/2,(ih-sh)/2,sw,sh];
+}
+
+/* ---------- main draw ---------- */
+function drawScene(ctx,W,H,k,opts){
+ const d=opts.dev,g=geom(d),col=d.colors[opts.ci].c;
+ const[bW,bH]=bodySize(d);
+ const land=opts.landscape&&d.frame!=='mac';
+ const margin=opts.shadow?24:12;
+ ctx.clearRect(0,0,W,H);
+ // background
+ const bg=BGS.find(b=>b.id===opts.bg);
+ if(bg&&(bg.c||bg.grad)){
+   if(bg.grad){const gr=ctx.createLinearGradient(0,0,W,H);gr.addColorStop(0,bg.grad[0]);gr.addColorStop(1,bg.grad[1]);ctx.fillStyle=gr;}
+   else ctx.fillStyle=bg.c;
+   ctx.fillRect(0,0,W,H);
+ }
+ ctx.save();
+ ctx.translate(W/2,H/2);
+ if(land)ctx.rotate(Math.PI/2);
+ ctx.scale(k,k);                         // pt -> canvas px
+ const x0=-bW/2,y0=-bH/2;
+ // side buttons (peek out of the body silhouette)
+ const btnC=shade(col,-0.18);
+ function button(x,y,w,h){rr(ctx,x,y,w,h,Math.min(w,h)/2);ctx.fillStyle=btnC;ctx.fill();}
+ if(g.island||g.notch){
+   const ext=3.4;
+   button(x0-ext,y0+bH*.185,ext,bH*.024);
+   button(x0-ext,y0+bH*.245,ext,bH*.050);
+   button(x0-ext,y0+bH*.315,ext,bH*.050);
+   button(x0+bW,y0+bH*.26,ext,bH*.085);
+ }
+ if(d.frame==='watch'){
+   const ext=4;
+   button(x0+bW,y0+bH*.22,ext,bH*.15);
+   button(x0+bW,y0+bH*.44,ext,bH*.09);
+ }
+ if(d.frame==='home'||d.frame==='homeplus'){
+   const ext=3;
+   button(x0-ext,y0+bH*.16,ext,bH*.028);
+   button(x0+bW,y0+bH*.19,ext,bH*.07);
+ }
+ // body
+ const bodyGrad=ctx.createLinearGradient(x0,y0,x0,y0+bH);
+ bodyGrad.addColorStop(0,shade(col,.16));bodyGrad.addColorStop(.5,col);bodyGrad.addColorStop(1,shade(col,-.10));
+ ctx.save();
+ if(opts.shadow){ctx.shadowColor='rgba(0,0,0,.38)';ctx.shadowBlur=22;ctx.shadowOffsetY=10;}
+ rr(ctx,x0,y0,bW,bH,g.br);ctx.fillStyle=bodyGrad;ctx.fill();
+ ctx.restore();
+ rr(ctx,x0+.8,y0+.8,bW-1.6,bH-1.6,g.br-1);ctx.strokeStyle='rgba(255,255,255,.34)';ctx.lineWidth=1.4;ctx.stroke();
+ // screen rect
+ const sx=x0+g.bezel,sy=HOME_FRAMES.includes(d.frame)?y0+g.top:y0+g.bezel;
+ ctx.save();
+ rr(ctx,sx,sy,g.sw,g.sh,g.sr);ctx.clip();
+ ctx.fillStyle='#000';ctx.fillRect(sx,sy,g.sw,g.sh);
+ if(opts.img){
+   const iw=opts.iw,ih=opts.ih;
+   const dw=land?g.sh:g.sw,dh=land?g.sw:g.sh;      // dest rect measured in image space
+   const[cxp,cyp,cw,chh]=coverRect(iw,ih,dw,dh);
+   ctx.save();
+   ctx.translate(sx+g.sw/2,sy+g.sh/2);
+   if(land)ctx.rotate(Math.PI/2);
+   ctx.drawImage(opts.img,cxp,cyp,cw,chh,-dw/2,-dh/2,dw,dh);
+   ctx.restore();
+   const rg=ctx.createLinearGradient(sx,sy,sx+g.sw*.55,sy+g.sh*.45);
+   rg.addColorStop(0,'rgba(255,255,255,.075)');rg.addColorStop(.42,'rgba(255,255,255,0)');
+   ctx.fillStyle=rg;ctx.fillRect(sx,sy,g.sw,g.sh);
+ }
+ // island / notch (over the screen, inside clip)
+ if(g.island){
+   const py=y0+g.bezel+g.pillTop;
+   rr(ctx,-g.pillW/2,py,g.pillW,g.pillH,g.pillH/2);ctx.fillStyle='#050506';ctx.fill();
+   ctx.beginPath();ctx.arc(g.pillW/2-g.pillH*.62,py+g.pillH/2,g.pillH*.16,0,7);
+   ctx.fillStyle='#16181d';ctx.fill();
+ }
+ if(g.notch){
+   const nw=g.notchW,nh=g.notchH,nx=sx+g.sw/2-nw/2;
+   ctx.beginPath();
+   ctx.moveTo(nx,sy);ctx.lineTo(nx+nw,sy);ctx.lineTo(nx+nw,sy+nh-nh*.28);
+   ctx.arcTo(nx+nw,sy+nh,nx+nw-nh*.28,sy+nh,nh*.28);
+   ctx.lineTo(nx+nh*.28,sy+nh);
+   ctx.arcTo(nx,sy+nh,nx,sy+nh-nh*.28,nh*.28);
+   ctx.closePath();ctx.fillStyle='#050506';ctx.fill();
+ }
+ if(d.frame==='mac'){
+   rr(ctx,-g.notchW/2,y0+g.bezel,g.notchW,g.notchH,4);ctx.fillStyle='#050506';ctx.fill();
+ }
+ ctx.restore(); // unclip screen
+ // hardware outside the screen
+ if(HOME_FRAMES.includes(d.frame)){
+   ctx.fillStyle='rgba(0,0,0,.5)';
+   rr(ctx,-g.ear/2,y0+g.top*.42,g.ear,Math.max(2.6,g.top*.09),3);ctx.fill();
+   ctx.beginPath();ctx.arc(-g.ear/2-g.top*.16,y0+g.top*.42+g.top*.045,Math.max(2.4,g.top*.055),0,7);
+   ctx.fillStyle='#10131a';ctx.fill();
+   const hy=y0+bH-g.bottom/2;
+   ctx.beginPath();ctx.arc(0,hy,g.homeBtn/2,0,7);
+   ctx.fillStyle=shade(col,-.06);ctx.fill();
+   ctx.strokeStyle='rgba(0,0,0,.28)';ctx.lineWidth=1;ctx.stroke();
+   ctx.beginPath();ctx.arc(0,hy,g.homeBtn/2*.62,0,7);ctx.strokeStyle='rgba(0,0,0,.14)';ctx.stroke();
+ }
+ if(d.frame==='padhome'){
+   const hy=y0+bH-g.bezel/2;
+   ctx.beginPath();ctx.arc(0,hy,g.homeBtn/2,0,7);ctx.strokeStyle='rgba(0,0,0,.30)';ctx.lineWidth=1.4;ctx.stroke();
+ }
+ if(d.frame==='padhome'||d.frame==='padmodern'){
+   ctx.beginPath();ctx.arc(0,y0+(g.bezel+g.sr*.5),Math.max(1.6,g.cam),0,7);
+   ctx.fillStyle='#0b0d12';ctx.fill();
+ }
+ if(d.frame==='mac'){
+   const dy=y0+bH,dkW=bW+g.deckExt*2,dkH=g.deck;
+   const dg=ctx.createLinearGradient(0,dy,0,dy+dkH);
+   dg.addColorStop(0,shade(col,.10));dg.addColorStop(1,shade(col,-.14));
+   rr(ctx,-dkW/2,dy-0.5,dkW,dkH+2,dkH/2);ctx.fillStyle=dg;ctx.fill();
+   ctx.fillStyle='rgba(0,0,0,.30)';
+   rr(ctx,-g.sw*.11,dy+dkH*.30,g.sw*.22,dkH*.26,dkH*.16);ctx.fill();
+ }
+ ctx.restore();
+}
+
+/* ---------- preview ---------- */
+const stage=$('stage');
+function scenePad(shadowOn){return shadowOn?34:8;}   // room for side buttons (+ shadow spread)
+function renderPreview(){
+ if(!state.img)return;
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ const d=state.dev;
+ const[aW,aH]=bodySize(d);
+ const land=state.landscape&&d.frame!=='mac';
+ const shadowOn=state.shadow&&state.bg!=='transparent';
+ const pad=scenePad(shadowOn);
+ const vW=(land?aH:aW)+pad*2,vH=(land?aW:aH)+pad*2;
+ const cardW=$('stageCard').clientWidth-36;
+ const maxW=Math.max(200,Math.min(cardW,680)),maxH=Math.min(window.innerHeight*.72,860);
+ const k=Math.min(maxW/vW,maxH/vH);
+ const cssW=vW*k,cssH=vH*k;
+ stage.style.display='block';
+ stage.style.width=cssW+'px';stage.style.height=cssH+'px';
+ stage.width=Math.max(2,Math.round(cssW*dpr));stage.height=Math.max(2,Math.round(cssH*dpr));
+ drawScene(stage.getContext('2d'),stage.width,stage.height,k*dpr,{dev:d,ci:state.ci,img:state.img,iw:state.iw,ih:state.ih,bg:state.bg,shadow:shadowOn,landscape:state.landscape,pad});
+ $('stageActs').hidden=false;
+ $('demoBtn0').hidden=true;
+ $('drop').style.display='none';
+}
+
+/* ---------- UI ---------- */
+function buildDeviceSelect(){
+ const sel=$('devSel');sel.innerHTML='';
+ const groups={iphone:'iPhone',ipad:'iPad',watch:'Apple Watch',mac:'Mac'};
+ for(const[cat,label]of Object.entries(groups)){
+   const og=document.createElement('optgroup');og.label=label;
+   for(const d of DEVICES.filter(x=>x.cat===cat)){
+     const o=document.createElement('option');o.value=d.id;o.textContent=d.name;og.appendChild(o);
+   }
+   sel.appendChild(og);
+ }
+ sel.value=state.dev.id;
+}
+function buildSwatches(){
+ const cwrap=$('colSw');cwrap.innerHTML='';
+ state.dev.colors.forEach((c,i)=>{
+   const b=document.createElement('button');b.type='button';b.className='swb'+(i===state.ci?' sel':'');
+   b.style.background=`linear-gradient(145deg,${shade(c.c,.22)},${c.c} 55%,${shade(c.c,-.14)})`;
+   b.title=LANG==='zh'?c.zh:c.en;b.setAttribute('aria-label',b.title);
+   b.onclick=()=>{state.ci=i;buildSwatches();renderPreview();savePrefs();};
+   cwrap.appendChild(b);
+ });
+}
+function buildBgSwatches(){
+ const wrap=$('bgSw');wrap.innerHTML='';
+ BGS.forEach(bg=>{
+   const b=document.createElement('button');b.type='button';b.className='swb bg'+(bg.id===state.bg?' sel':'');
+   if(bg.grad){b.style.background=`linear-gradient(135deg,${bg.grad[0]},${bg.grad[1]})`;}
+   else if(bg.c){b.style.background=bg.c;}
+   else{b.classList.add('tr');}
+   b.title=bg.id[0].toUpperCase()+bg.id.slice(1);
+   b.onclick=()=>{state.bg=bg.id;buildBgSwatches();renderPreview();savePrefs();};
+   wrap.appendChild(b);
+ });
+}
+function renderBadge(){
+ const bd=$('detBadge');
+ if(!state.img){bd.classList.remove('show');return;}
+ bd.classList.add('show');
+ bd.className='show '+(state.conf||'none');
+ let txt='';
+ if(state.conf==='exact')txt=`${t('detExact')}: ${state.dev.name}`;
+ else if(state.conf==='guess')txt=`${t('detGuess')}: ${state.dev.name}`;
+ else if(state.conf==='manual')txt=`${t('detManual')}: ${state.dev.name}`;
+ else txt=t('detNone');
+ $('detText').textContent=txt;
+ $('detDims').textContent=state.dev?`· ${state.dev.px[0]} × ${state.dev.px[1]} ${t('px')}`:'';
+}
+function savePrefs(){
+ try{localStorage.setItem('moclens-prefs',JSON.stringify({dev:state.dev.id,ci:state.ci,bg:state.bg,shadow:state.shadow,scale:state.scale}));}catch(e){}
+}
+function loadPrefs(){
+ try{return JSON.parse(localStorage.getItem('moclens-prefs')||'{}');}catch(e){return{};}
+}
+
+/* ---------- image loading ---------- */
+async function loadFile(file){
+ if(!file||!file.type.startsWith('image/'))return;
+ let img,w,h;
+ try{
+   img=await createImageBitmap(file,{imageOrientation:'from-image'});
+   w=img.width;h=img.height;
+ }catch(e){
+   try{
+     img=await new Promise((res,rej)=>{
+       const im=new Image();
+       im.onload=()=>res(im);im.onerror=rej;
+       im.src=URL.createObjectURL(file);
+     });
+     w=img.naturalWidth;h=img.naturalHeight;
+   }catch(e2){toast(t('toastBadImg'));return;}
+ }
+ const MAX=6000;
+ if(Math.max(w,h)>MAX){
+   const k2=MAX/Math.max(w,h);
+   const cv=document.createElement('canvas');cv.width=Math.round(w*k2);cv.height=Math.round(h*k2);
+   cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+   img=cv;w=cv.width;h=cv.height;
+ }
+ applyImage(img,w,h);
+ toast(t('toastLoaded'));
+}
+function applyImage(img,w,h){
+ state.img=img;state.iw=w;state.ih=h;state.landscape=w>h;
+ const res=detect(w,h);
+ state.conf=res.conf;
+ if(res.dev){state.dev=res.dev;state.ci=0;}
+ buildDeviceSelect();
+ buildSwatches();buildBgSwatches();renderBadge();renderPreview();savePrefs();
+}
+
+/* ---------- export ---------- */
+function exportCanvas(){
+ const d=state.dev;
+ const[aW,aH]=bodySize(d);
+ const land=state.landscape&&d.frame!=='mac';
+ const g=geom(d);
+ const shadowOn=state.shadow&&state.bg!=='transparent';
+ const pad=scenePad(shadowOn);
+ const kk=(d.px[0]/g.sw)*(state.scale===2?2:1);   // native px per pt
+ const cv=document.createElement('canvas');
+ cv.width=Math.round(((land?aH:aW)+pad*2)*kk);cv.height=Math.round(((land?aW:aH)+pad*2)*kk);
+ drawScene(cv.getContext('2d'),cv.width,cv.height,kk,{dev:d,ci:state.ci,img:state.img,iw:state.iw,ih:state.ih,bg:state.bg,shadow:shadowOn,landscape:state.landscape,pad});
+ return cv;
+}
+function download(){
+ if(!state.img)return;
+ exportCanvas().toBlob(blob=>{
+   const a=document.createElement('a');
+   a.href=URL.createObjectURL(blob);
+   a.download=`mocklens-${state.dev.id}${state.scale===2?'@2x':''}.png`;
+   a.click();
+   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+   try{window.mxFunnel&&window.mxFunnel();}catch(e){}
+ },'image/png');
+}
+
+/* ---------- toast ---------- */
+let toastTimer=null;
+function toast(msg){
+ const el=$('toast');el.textContent=msg;el.classList.add('on');
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('on'),1900);
+}
+
+/* ---------- demo screenshot (fake fitness app, iPhone 16 Pro resolution) ---------- */
+function makeDemo(){
+ const w=1179,h=2556,cv=document.createElement('canvas');cv.width=w;cv.height=h;
+ const x=cv.getContext('2d');
+ const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'#101b33');g.addColorStop(1,'#1c1030');
+ x.fillStyle=g;x.fillRect(0,0,w,h);
+ x.fillStyle='rgba(255,255,255,.9)';x.font='600 46px system-ui,sans-serif';x.textAlign='center';
+ x.fillText('9:41',w/2,130);
+ x.textAlign='right';x.font='400 40px system-ui,sans-serif';x.fillText('▲ 5G  ⚡',w-70,126);
+ x.textAlign='left';x.fillText('☎ ▮▮▮',70,126);
+ x.textAlign='center';x.fillStyle='#fff';x.font='700 92px system-ui,sans-serif';
+ x.fillText('Good morning',w/2,430);
+ x.font='400 44px system-ui,sans-serif';x.fillStyle='rgba(255,255,255,.55)';
+ x.fillText('Your day at a glance',w/2,510);
+ const cards=[[640,'#2997ff','Steps','12,483'],[1040,'#ff375f','Heart','72 bpm'],[1440,'#30d158','Sleep','7h 20m']];
+ for(const[y,col,label,val]of cards){
+   x.fillStyle='rgba(255,255,255,.08)';
+   rrp(x,90,y,w-180,320,44);x.fill();
+   x.fillStyle=col;x.beginPath();x.arc(190,y+160,56,0,7);x.fill();
+   x.textAlign='left';x.fillStyle='rgba(255,255,255,.6)';x.font='500 40px system-ui,sans-serif';
+   x.fillText(label,290,y+140);
+   x.fillStyle='#fff';x.font='700 72px system-ui,sans-serif';x.fillText(val,290,y+230);
+ }
+ x.fillStyle='rgba(255,255,255,.08)';rrp(x,90,1880,w-180,540,44);x.fill();
+ x.fillStyle='rgba(255,255,255,.6)';x.font='500 38px system-ui,sans-serif';x.textAlign='left';
+ x.fillText('This week',150,1980);
+ const bars=[.5,.75,.4,.9,.65,1,.8];
+ bars.forEach((b,i)=>{
+   const bh=330*b,bx=170+i*124;
+   const bg=x.createLinearGradient(0,2380-bh,0,2380);
+   bg.addColorStop(0,'#64d2ff');bg.addColorStop(1,'#5e5ce6');
+   x.fillStyle=bg;rrp(x,bx,2380-bh,74,bh,26);x.fill();
+ });
+ return cv;
+ function rrp(c,a,b2,ww,hh,r){c.beginPath();c.moveTo(a+r,b2);c.arcTo(a+ww,b2,a+ww,b2+hh,r);c.arcTo(a+ww,b2+hh,a,b2+hh,r);c.arcTo(a,b2+hh,a,b2,r);c.arcTo(a,b2,a+ww,b2,r);c.closePath();}
+}
+function loadDemo(){
+ const cv=makeDemo();
+ applyImage(cv,cv.width,cv.height);
+}
+
+/* ---------- theme ---------- */
+function applyTheme(mode){
+ const dark=mode==='dark'||(mode==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
+ document.documentElement.classList.toggle('dark',dark);
+ try{localStorage.setItem('moclens-theme',mode);}catch(e){}
+}
+function cycleTheme(){
+ const cur=localStorage.getItem('moclens-theme')||'auto';
+ const next=cur==='auto'?'light':cur==='light'?'dark':'auto';
+ applyTheme(next);
+ toast('Theme: '+next);
+}
+
+/* ---------- init ---------- */
+let fileInput;
+function init(){
+ const params=new URLSearchParams(location.search);
+ const saved=loadPrefs();
+ let lang=params.get('lang');
+ if(!lang){try{lang=localStorage.getItem('moclens-lang');}catch(e){}}
+ if(!lang)lang=(navigator.language||'en').toLowerCase().startsWith('zh')?'zh':'en';
+ LANG=lang==='zh'?'zh':'en';
+ try{localStorage.setItem('moclens-lang',LANG);}catch(e){}
+
+ applyTheme(localStorage.getItem('moclens-theme')||'auto');
+ if(saved.dev&&BYID[saved.dev]){state.dev=BYID[saved.dev];state.ci=Math.min(saved.ci||0,BYID[saved.dev].colors.length-1);}
+ if(saved.bg&&BGS.some(b=>b.id===saved.bg))state.bg=saved.bg;
+ if(typeof saved.shadow==='boolean')state.shadow=saved.shadow;
+ if(saved.scale===2)state.scale=2;
+ $('shadowCk').checked=state.shadow;
+ document.querySelectorAll('#scaleSeg button').forEach(b=>b.classList.toggle('sel',+b.dataset.s===state.scale));
+
+ buildDeviceSelect();buildSwatches();buildBgSwatches();renderBadge();
+ applyLang();
+
+ $('langBtn').onclick=()=>{LANG=LANG==='en'?'zh':'en';try{localStorage.setItem('moclens-lang',LANG);}catch(e){}applyLang();};
+ $('themeBtn').onclick=cycleTheme;
+ $('shadowCk').onchange=e=>{state.shadow=e.target.checked;renderPreview();savePrefs();};
+ $('devSel').onchange=e=>{
+   state.dev=BYID[e.target.value];
+   state.ci=Math.min(state.ci,state.dev.colors.length-1);
+   if(state.img)state.conf='manual';
+   buildSwatches();renderBadge();renderPreview();savePrefs();
+ };
+ document.querySelectorAll('#scaleSeg button').forEach(b=>b.onclick=()=>{
+   state.scale=+b.dataset.s;
+   document.querySelectorAll('#scaleSeg button').forEach(x=>x.classList.toggle('sel',x===b));
+   savePrefs();
+ });
+ $('dlBtn').onclick=()=>{if(!state.img){toast(t('dropBig'));return;}download();};
+ $('cpBtn').onclick=async()=>{
+   if(!state.img){toast(t('dropBig'));return;}
+   try{
+     const cv=exportCanvas();
+     const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+     await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+     toast(t('toastCopied'));
+   }catch(e){toast(t('toastCopyFail'));}
+ };
+ $('demoBtn0').onclick=loadDemo;
+ $('demoBtn').onclick=loadDemo;
+ $('replaceBtn').onclick=()=>fileInput.click();
+ const drop=$('drop');
+ drop.onclick=()=>fileInput.click();
+ drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')fileInput.click();};
+ ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('on');}));
+ ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('on');}));
+ drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)loadFile(f);});
+ document.addEventListener('paste',e=>{
+   const item=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith('image/'));
+   if(item)loadFile(item.getAsFile());
+ });
+ const fileIn=document.createElement('input');
+ fileIn.type='file';fileIn.accept='image/*';fileIn.style.display='none';
+ fileIn.onchange=()=>{if(fileIn.files[0])loadFile(fileIn.files[0]);fileIn.value='';};
+ document.body.appendChild(fileIn);
+ fileInput=fileIn;
+ let rT=null;
+ window.addEventListener('resize',()=>{clearTimeout(rT);rT=setTimeout(renderPreview,200);});
+
+ window.__ML={state,DEVICES,BYID,detect,drawScene,exportCanvas,loadDemo,loadFile,renderPreview,applyLang,
+   setLang:l=>{LANG=l==='zh'?'zh':'en';applyLang();}};
+}
+init();
+</script>
+</body>
+</html>
