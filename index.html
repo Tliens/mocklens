@@ -5,24 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MockLens — iPhone Screenshot Frames &amp; Device Mockups</title>
 <meta name="description" content="Upload a screenshot and MockLens detects the exact Apple device by resolution, puts it in a realistic frame with every official color, and exports a high-res PNG — 100% in your browser.">
-<link rel="canonical" href="https://moclens.kuige.me/">
-<link rel="alternate" hreflang="en" href="https://moclens.kuige.me/">
-<link rel="alternate" hreflang="zh" href="https://moclens.kuige.me/?lang=zh">
-<link rel="alternate" hreflang="x-default" href="https://moclens.kuige.me/">
+<link rel="canonical" href="https://mocklens.kuige.me/">
+<link rel="alternate" hreflang="en" href="https://mocklens.kuige.me/">
+<link rel="alternate" hreflang="zh" href="https://mocklens.kuige.me/?lang=zh">
+<link rel="alternate" hreflang="x-default" href="https://mocklens.kuige.me/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MockLens">
 <meta property="og:title" content="MockLens — iPhone Screenshot Frames &amp; Device Mockups">
 <meta property="og:description" content="Auto-detect the Apple device from any screenshot resolution, drop it into a realistic frame, switch every official color, export high-res PNG. All local, no upload.">
-<meta property="og:url" content="https://moclens.kuige.me/">
-<meta property="og:image" content="https://moclens.kuige.me/og-image.png">
+<meta property="og:url" content="https://mocklens.kuige.me/">
+<meta property="og:image" content="https://mocklens.kuige.me/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="MockLens — iPhone Screenshot Frames &amp; Device Mockups">
 <meta name="twitter:description" content="Auto-detect the Apple device from any screenshot resolution, drop it into a realistic frame, switch every official color, export high-res PNG.">
-<meta name="twitter:image" content="https://moclens.kuige.me/og-image.png">
+<meta name="twitter:image" content="https://mocklens.kuige.me/og-image.png">
 <link rel="icon" type="image/png" href="favicon.png?v=1">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"MockLens","url":"https://moclens.kuige.me/","applicationCategory":"DesignApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Detect the Apple device from a screenshot's resolution, place it in a realistic device frame, switch every official color and export a high-res PNG — fully local in the browser.","featureList":"Apple device detection by screenshot resolution,iPhone/iPad/Apple Watch/MacBook frames,Official color switching,Transparent PNG export,100% client-side"}
+{"@context":"https://schema.org","@type":"WebApplication","name":"MockLens","url":"https://mocklens.kuige.me/","applicationCategory":"DesignApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Detect the Apple device from a screenshot's resolution, place it in a realistic device frame, switch every official color and export a high-res PNG — fully local in the browser.","featureList":"Apple device detection by screenshot resolution,iPhone/iPad/Apple Watch/MacBook frames,Official color switching,Transparent PNG export,100% client-side"}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
@@ -240,7 +240,7 @@ details p{color:var(--sub);font-size:14.5px;margin-top:8px}
 <!-- 矩阵导流：完成点推荐（独立脚本，不依赖站点 JS） -->
 <script>
 (function(){
-  var F={key:'funnel_moclens_shareforge_v1',url:'https://shareforge.kuige.me/?from=moclens',
+  var F={key:'funnel_mocklens_shareforge_v1',url:'https://shareforge.kuige.me/?from=mocklens',
     zh:{title:'做张分享图？',why:'带壳截图已完成，配上文案和模板直接发社交平台',btn:'打开 ShareForge'},
     en:{title:'Make a share card?',why:'Your framed screenshot is ready — add copy and a template for social',btn:'Open ShareForge'}};
   var st=document.createElement('style');
@@ -693,10 +693,10 @@ function renderBadge(){
  $('detDims').textContent=state.dev?`· ${state.dev.px[0]} × ${state.dev.px[1]} ${t('px')}`:'';
 }
 function savePrefs(){
- try{localStorage.setItem('moclens-prefs',JSON.stringify({dev:state.dev.id,ci:state.ci,bg:state.bg,shadow:state.shadow,scale:state.scale}));}catch(e){}
+ try{localStorage.setItem('mocklens-prefs',JSON.stringify({dev:state.dev.id,ci:state.ci,bg:state.bg,shadow:state.shadow,scale:state.scale}));}catch(e){}
 }
 function loadPrefs(){
- try{return JSON.parse(localStorage.getItem('moclens-prefs')||'{}');}catch(e){return{};}
+ try{return JSON.parse(localStorage.getItem('mocklens-prefs')||'{}');}catch(e){return{};}
 }
 
 /* ---------- image loading ---------- */
@@ -813,10 +813,10 @@ function loadDemo(){
 function applyTheme(mode){
  const dark=mode==='dark'||(mode==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
  document.documentElement.classList.toggle('dark',dark);
- try{localStorage.setItem('moclens-theme',mode);}catch(e){}
+ try{localStorage.setItem('mocklens-theme',mode);}catch(e){}
 }
 function cycleTheme(){
- const cur=localStorage.getItem('moclens-theme')||'auto';
+ const cur=localStorage.getItem('mocklens-theme')||'auto';
  const next=cur==='auto'?'light':cur==='light'?'dark':'auto';
  applyTheme(next);
  toast('Theme: '+next);
@@ -828,12 +828,12 @@ function init(){
  const params=new URLSearchParams(location.search);
  const saved=loadPrefs();
  let lang=params.get('lang');
- if(!lang){try{lang=localStorage.getItem('moclens-lang');}catch(e){}}
+ if(!lang){try{lang=localStorage.getItem('mocklens-lang');}catch(e){}}
  if(!lang)lang=(navigator.language||'en').toLowerCase().startsWith('zh')?'zh':'en';
  LANG=lang==='zh'?'zh':'en';
- try{localStorage.setItem('moclens-lang',LANG);}catch(e){}
+ try{localStorage.setItem('mocklens-lang',LANG);}catch(e){}
 
- applyTheme(localStorage.getItem('moclens-theme')||'auto');
+ applyTheme(localStorage.getItem('mocklens-theme')||'auto');
  if(saved.dev&&BYID[saved.dev]){state.dev=BYID[saved.dev];state.ci=Math.min(saved.ci||0,BYID[saved.dev].colors.length-1);}
  if(saved.bg&&BGS.some(b=>b.id===saved.bg))state.bg=saved.bg;
  if(typeof saved.shadow==='boolean')state.shadow=saved.shadow;
@@ -844,7 +844,7 @@ function init(){
  buildDeviceSelect();buildSwatches();buildBgSwatches();renderBadge();
  applyLang();
 
- $('langBtn').onclick=()=>{LANG=LANG==='en'?'zh':'en';try{localStorage.setItem('moclens-lang',LANG);}catch(e){}applyLang();};
+ $('langBtn').onclick=()=>{LANG=LANG==='en'?'zh':'en';try{localStorage.setItem('mocklens-lang',LANG);}catch(e){}applyLang();};
  $('themeBtn').onclick=cycleTheme;
  $('shadowCk').onchange=e=>{state.shadow=e.target.checked;renderPreview();savePrefs();};
  $('devSel').onchange=e=>{
