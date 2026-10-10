@@ -328,7 +328,7 @@ zh:{
 }};
 
 /* ---------- device database (logical screen pt + native px + official colors) ---------- */
-const C=(en,zh,c)=>({en,zh,c});
+const C=(en,zh,c,f)=>f?({en,zh,c,f}):({en,zh,c});
 const TITANIUM16=[
  C('Black Titanium','黑色钛金属','#3a3a3d'),C('White Titanium','白色钛金属','#e4e2db'),
  C('Natural Titanium','原色钛金属','#b8b2a7'),C('Desert Titanium','沙漠色钛金属','#c8a882'),
@@ -363,15 +363,21 @@ const MACCOLS=[
 
 const DEVICES=[
  // iPhone — sw/sh are logical points; px is the native screenshot size
- {id:'ip17pm',cat:'iphone',name:'iPhone 17 Pro Max / 16 Pro Max',sw:440,sh:956,px:[1320,2868],frame:'island',colors:TITANIUM16},
- {id:'ip17',cat:'iphone',name:'iPhone 17 Pro / 17 / 16 Pro',sw:402,sh:874,px:[1206,2622],frame:'island',colors:TITANIUM16},
- {id:'ipair',cat:'iphone',name:'iPhone Air',sw:420,sh:912,px:[1260,2736],frame:'island',
-  colors:[C('Space Black','深空黑色','#2f2d31'),C('Cloud White','云朵白','#eae8e3'),C('Light Gold','浅金色','#ebdcc2'),C('Sky Blue','天空蓝','#afc8da')]},
- {id:'ip16',cat:'iphone',name:'iPhone 16 / 15 / 15 Pro / 14 Pro',sw:393,sh:852,px:[1179,2556],frame:'island',colors:PALETTE15},
- {id:'ip16p',cat:'iphone',name:'iPhone 16 Plus / 15 Plus / 15 Pro Max / 14 Pro Max',sw:430,sh:932,px:[1290,2796],frame:'island',colors:PALETTE15},
+ {id:'ip17pm',cat:'iphone',name:'iPhone 17 Pro Max / 16 Pro Max',sw:440,sh:956,px:[1320,2868],frame:'island',engine:'photo',colors:[
+  C('Cosmic Orange','宇宙橙','#e0602c','ip17pm-orange'),C('Deep Blue','深蓝色','#3e4a63','ip17pm-blue'),C('Silver','银色','#d8d6d1','ip17pm-silver')]},
+ {id:'ip17',cat:'iphone',name:'iPhone 17 Pro / 17',sw:402,sh:874,px:[1206,2622],frame:'island',engine:'photo',colors:[
+  C('Cosmic Orange','宇宙橙','#e0602c','ip17-orange'),C('Deep Blue','深蓝色','#3e4a63','ip17-blue'),C('Silver','银色','#d8d6d1','ip17-silver')]},
+ {id:'ip16pro',cat:'iphone',name:'iPhone 16 Pro',sw:402,sh:874,px:[1206,2622],frame:'island',engine:'photo',colors:[
+  C('Black Titanium','黑色钛金属','#3a3a3d','ip16pro-black'),C('White Titanium','白色钛金属','#e4e2db','ip16pro-white'),C('Natural Titanium','原色钛金属','#b8b2a7','ip16pro-natural'),C('Desert Titanium','沙漠色钛金属','#c8a882','ip16pro-desert')]},
+ {id:'ipair',cat:'iphone',name:'iPhone Air',sw:420,sh:912,px:[1260,2736],frame:'island',engine:'photo',colors:[
+  C('Space Black','深空黑色','#2f2d31','ipair-black'),C('Cloud White','云朵白','#eae8e3','ipair-white'),C('Light Gold','浅金色','#ebdcc2','ipair-gold'),C('Sky Blue','天空蓝','#afc8da','ipair-sky')]},
+ {id:'ip16',cat:'iphone',name:'iPhone 16 / 15 / 15 Pro / 14 Pro',sw:393,sh:852,px:[1179,2556],frame:'island',engine:'photo',colors:[
+  C('Black','黑色','#3f3f42','ip16-black'),C('White','白色','#f2f0ea','ip16-white'),C('Pink','粉色','#efc8ce','ip16-pink'),C('Teal','青绿色','#a9cec6','ip16-teal'),C('Ultramarine','群青色','#6e85c7','ip16-ultra')]},
+ {id:'ip16p',cat:'iphone',name:'iPhone 16 Plus / 15 Plus / 15 Pro Max / 14 Pro Max',sw:430,sh:932,px:[1290,2796],frame:'island',engine:'photo',colors:[
+  C('Black','黑色','#3f3f42','ip16p-black'),C('White','白色','#f2f0ea','ip16p-white'),C('Pink','粉色','#efc8ce','ip16p-pink'),C('Teal','青绿色','#a9cec6','ip16p-teal'),C('Ultramarine','群青色','#6e85c7','ip16p-ultra')]},
  {id:'ip14',cat:'iphone',name:'iPhone 14 / 13 / 13 Pro / 12 Pro / 12',sw:390,sh:844,px:[1170,2532],frame:'island',colors:PALETTE14},
- {id:'ipmini',cat:'iphone',name:'iPhone 13 mini / 12 mini',sw:375,sh:812,px:[1080,2340],frame:'island',
-  colors:[C('Midnight','午夜色','#232b38'),C('Starlight','星光色','#ede9de'),C('Blue','蓝色','#a8c3dc'),C('Pink','粉色','#efbfc8'),C('Red','红色','#be3a3f'),C('Green','绿色','#b3c9b1'),C('White','白色','#f5f4ef'),C('Black','黑色','#3b3b3d'),C('Purple','紫色','#cbc1e3')]},
+ {id:'ipmini',cat:'iphone',name:'iPhone 13 mini / 12 mini',sw:375,sh:812,px:[1080,2340],frame:'island',engine:'photo',colors:[
+  C('Black','黑色','#3b3b3d','ipmini-black'),C('Starlight','星光色','#ede9de','ipmini-starlight'),C('Blue','蓝色','#a8c3dc','ipmini-blue'),C('Pink','粉色','#efbfc8','ipmini-pink'),C('Product Red','红色','#be3a3f','ipmini-red')]},
  {id:'ip11p',cat:'iphone',name:'iPhone 11 Pro Max / XS Max',sw:414,sh:896,px:[1242,2688],frame:'notch',
   colors:[C('Space Gray','深空灰色','#434347'),C('Silver','银色','#e5e5e7'),C('Gold','金色','#eadfc6'),C('Midnight Green','暗夜绿色','#4e5851')]},
  {id:'ip11pro',cat:'iphone',name:'iPhone 11 Pro / XS / X',sw:375,sh:812,px:[1125,2436],frame:'notch',
@@ -382,8 +388,10 @@ const DEVICES=[
  {id:'ipse',cat:'iphone',name:'iPhone SE (1st gen) / 5s / 5 / 5c',sw:320,sh:568,px:[640,1136],frame:'se',
   colors:[C('Silver','银色','#e8e8ea'),C('Gold','金色','#e7d3a5'),C('Space Gray','深空灰色','#454549'),C('Blue','蓝色','#a7c6e8'),C('Green','绿色','#b8dcb4'),C('Yellow','黄色','#f5e39c'),C('Pink','粉色','#f2b8c6'),C('White','白色','#f7f5f0')]},
  // iPad
- {id:'pad13',cat:'ipad',name:'iPad Pro 13″ (M4)',sw:1032,sh:1376,px:[2064,2752],frame:'padmodern',colors:[C('Silver','银色','#e4e4e6'),C('Space Black','深空黑色','#3b3b3e')]},
- {id:'pad11m4',cat:'ipad',name:'iPad Pro 11″ (M4)',sw:834,sh:1210,px:[1668,2420],frame:'padmodern',colors:[C('Silver','银色','#e4e4e6'),C('Space Black','深空黑色','#3b3b3e')]},
+ {id:'pad13',cat:'ipad',name:'iPad Pro 13″ (M4)',sw:1032,sh:1376,px:[2064,2752],frame:'padmodern',engine:'photo',colors:[
+  C('Silver','银色','#e4e4e6','pad13-silver'),C('Space Black','深空黑色','#3b3b3e','pad13-black')]},
+ {id:'pad11m4',cat:'ipad',name:'iPad Pro 11″ (M4)',sw:834,sh:1210,px:[1668,2420],frame:'padmodern',engine:'photo',colors:[
+  C('Silver','银色','#e4e4e6','pad11-silver'),C('Space Black','深空黑色','#3b3b3e','pad11-black')]},
  {id:'pad129',cat:'ipad',name:'iPad Pro 12.9″ (1st–6th gen)',sw:1024,sh:1366,px:[2048,2732],frame:'padhome',colors:[C('Silver','银色','#e4e4e6'),C('Space Gray','深空灰色','#545458')]},
  {id:'pad11',cat:'ipad',name:'iPad Pro 11″ (1st–4th gen) / Air 11″ (M2/M3)',sw:834,sh:1194,px:[1668,2388],frame:'padhome',colors:PADCOLS},
  {id:'padair',cat:'ipad',name:'iPad Air 10.9″ / iPad 10th–11th gen',sw:820,sh:1180,px:[1640,2360],frame:'padhome',colors:PADCOLS},
@@ -401,13 +409,24 @@ const DEVICES=[
  {id:'w40',cat:'watch',name:'Apple Watch Series 4/5/6/SE (40mm)',px:[324,394],frame:'watch',colors:[C('Space Gray','深空灰色','#454549'),C('Silver','银色','#e5e5e7'),C('Gold','金色','#eadfc6'),C('Blue','蓝色','#7d98c1'),C('Red','红色','#c4383e')]},
  {id:'w3',cat:'watch',name:'Apple Watch Series 3',px:[312,390],frame:'watch',colors:[C('Space Gray','深空灰色','#454549'),C('Silver','银色','#e5e5e7'),C('Gold','金色','#eadfc6')]},
  // Mac — px stored portrait-normalized [min,max]; frames render landscape
- {id:'mbp16',cat:'mac',name:'MacBook Pro 16″',sw:1728,sh:1117,px:[2234,3456],frame:'mac',colors:MACCOLS},
- {id:'mbp14',cat:'mac',name:'MacBook Pro 14″',sw:1512,sh:982,px:[1964,3024],frame:'mac',colors:MACCOLS},
+ {id:'mbp16',cat:'mac',name:'MacBook Pro 16″',sw:1728,sh:1117,px:[2234,3456],frame:'mac',engine:'photo',colors:[
+  C('Space Black','深空黑色','#2e2e30','mbp16-black'),C('Silver','银色','#e3e4e6','mbp16-silver')]},
+ {id:'mbp14',cat:'mac',name:'MacBook Pro 14″',sw:1512,sh:982,px:[1964,3024],frame:'mac',engine:'photo',colors:[
+  C('Space Black','深空黑色','#2e2e30','mbp14-black'),C('Silver','银色','#e3e4e6','mbp14-silver')]},
  {id:'mba15',cat:'mac',name:'MacBook Air 15″',sw:1440,sh:932,px:[1864,2880],frame:'mac',colors:MACCOLS},
  {id:'mba13',cat:'mac',name:'MacBook Air 13″ (M2+)',sw:1280,sh:832,px:[1664,2560],frame:'mac',colors:MACCOLS},
 ];
 const BYID=Object.fromEntries(DEVICES.map(d=>[d.id,d]));
 const HOME_FRAMES=['home','homeplus','se'];
+const FRAME_MAN={"ip16-black":{"f":"ip16-black.webp","w":1379,"h":2756,"s":[67,67,1244,2624],"r":92},"ip16-pink":{"f":"ip16-pink.webp","w":1379,"h":2756,"s":[67,67,1244,2624],"r":92},"ip16-teal":{"f":"ip16-teal.webp","w":1379,"h":2756,"s":[67,67,1244,2624],"r":92},"ip16-ultra":{"f":"ip16-ultra.webp","w":1379,"h":2756,"s":[67,67,1244,2624],"r":92},"ip16-white":{"f":"ip16-white.webp","w":1379,"h":2756,"s":[67,67,1244,2624],"r":92},"ip16p-black":{"f":"ip16p-black.webp","w":1490,"h":2996,"s":[67,67,1355,2864],"r":92},"ip16p-pink":{"f":"ip16p-pink.webp","w":1490,"h":2996,"s":[67,67,1355,2864],"r":92},"ip16p-teal":{"f":"ip16p-teal.webp","w":1490,"h":2996,"s":[67,67,1355,2864],"r":92},"ip16p-ultra":{"f":"ip16p-ultra.webp","w":1490,"h":2996,"s":[67,67,1355,2864],"r":92},"ip16p-white":{"f":"ip16p-white.webp","w":1490,"h":2996,"s":[67,67,1355,2864],"r":92},"ip16pm-black":{"f":"ip16pm-black.webp","w":1520,"h":3068,"s":[82,82,1355,2906],"r":98},"ip16pm-desert":{"f":"ip16pm-desert.webp","w":1520,"h":3068,"s":[82,82,1355,2906],"r":98},"ip16pm-natural":{"f":"ip16pm-natural.webp","w":1520,"h":3068,"s":[82,82,1355,2906],"r":98},"ip16pm-white":{"f":"ip16pm-white.webp","w":1520,"h":3068,"s":[82,82,1355,2906],"r":98},"ip16pro-black":{"f":"ip16pro-black.webp","w":1406,"h":2822,"s":[82,81,1241,2661],"r":100},"ip16pro-desert":{"f":"ip16pro-desert.webp","w":1406,"h":2822,"s":[84,80,1240,2662],"r":96},"ip16pro-natural":{"f":"ip16pro-natural.webp","w":1406,"h":2822,"s":[82,81,1241,2661],"r":100},"ip16pro-white":{"f":"ip16pro-white.webp","w":1406,"h":2822,"s":[84,81,1241,2661],"r":100},"ip17-blue":{"f":"ip17-blue.webp","w":1406,"h":2822,"s":[78,85,1249,2659],"r":92},"ip17-orange":{"f":"ip17-orange.webp","w":1406,"h":2822,"s":[78,85,1249,2659],"r":92},"ip17-silver":{"f":"ip17-silver.webp","w":1406,"h":2822,"s":[78,85,1249,2659],"r":92},"ip17pm-blue":{"f":"ip17pm-blue.webp","w":1520,"h":3068,"s":[80,88,1359,2899],"r":89},"ip17pm-orange":{"f":"ip17pm-orange.webp","w":1520,"h":3068,"s":[80,88,1359,2899],"r":89},"ip17pm-silver":{"f":"ip17pm-silver.webp","w":1520,"h":3068,"s":[80,88,1359,2899],"r":89},"ipair-black":{"f":"ipair-black.webp","w":1490,"h":2996,"s":[76,85,1337,2835],"r":93},"ipair-gold":{"f":"ipair-gold.webp","w":1490,"h":2996,"s":[76,85,1337,2835],"r":94},"ipair-sky":{"f":"ipair-sky.webp","w":1490,"h":2996,"s":[76,85,1337,2835],"r":93},"ipair-white":{"f":"ipair-white.webp","w":1490,"h":2996,"s":[76,85,1337,2835],"r":94},"ipmini-black":{"f":"ipmini-black.webp","w":1280,"h":2540,"s":[61,86,1157,2392],"r":39},"ipmini-blue":{"f":"ipmini-blue.webp","w":1280,"h":2540,"s":[61,86,1157,2392],"r":39},"ipmini-pink":{"f":"ipmini-pink.webp","w":1280,"h":2540,"s":[61,86,1157,2392],"r":39},"ipmini-red":{"f":"ipmini-red.webp","w":1280,"h":2540,"s":[61,86,1157,2392],"r":39},"ipmini-starlight":{"f":"ipmini-starlight.webp","w":1280,"h":2540,"s":[61,86,1157,2392],"r":40},"mbp14-black":{"f":"mbp14-black.webp","w":3824,"h":2564,"s":[362,321,3099,1979],"r":309},"mbp14-silver":{"f":"mbp14-silver.webp","w":3824,"h":2564,"s":[362,320,3099,1980],"r":309},"mbp16-black":{"f":"mbp16-black.webp","w":4256,"h":2834,"s":[362,317,3531,2254],"r":353},"mbp16-silver":{"f":"mbp16-silver.webp","w":4256,"h":2834,"s":[362,320,3531,2251],"r":353},"pad11-black":{"f":"pad11-black.webp","w":1868,"h":2620,"s":[19,20,1827,2579],"r":78},"pad11-silver":{"f":"pad11-silver.webp","w":1868,"h":2620,"s":[19,20,1827,2579],"r":78},"pad13-black":{"f":"pad13-black.webp","w":2264,"h":2952,"s":[23,23,2217,2905],"r":76},"pad13-silver":{"f":"pad13-silver.webp","w":2264,"h":2952,"s":[23,23,2217,2905],"r":76}};
+const frameCache={};let pendingFrameKey=null;
+function loadFrame(key,cb){
+  if(frameCache[key])return cb(frameCache[key]);
+  const im=new Image();
+  im.onload=()=>{frameCache[key]=im;cb(im);};
+  im.onerror=()=>cb(null);
+  im.src='frames/'+FRAME_MAN[key].f;
+}
 
 /* ---------- color helpers ---------- */
 function hex2rgb(h){const n=parseInt(h.slice(1),16);return[n>>16&255,n>>8&255,n&255];}
@@ -506,9 +525,7 @@ function coverRect(iw,ih,dw,dh){
 /* ---------- main draw ---------- */
 function drawScene(ctx,W,H,k,opts){
  const d=opts.dev,g=geom(d),col=d.colors[opts.ci].c;
- const[bW,bH]=bodySize(d);
  const land=opts.landscape&&d.frame!=='mac';
- const margin=opts.shadow?24:12;
  ctx.clearRect(0,0,W,H);
  // background
  const bg=BGS.find(b=>b.id===opts.bg);
@@ -517,9 +534,39 @@ function drawScene(ctx,W,H,k,opts){
    else ctx.fillStyle=bg.c;
    ctx.fillRect(0,0,W,H);
  }
+ /* ---- 真机帧路径：Apple 官方帧渲染图 + 透明屏幕洞 ---- */
+ if(opts.photo&&opts.photo.img){
+   const m=opts.photo.man, fi=opts.photo.img;
+   const hw=m.w/2, hh=m.h/2;
+   ctx.save();
+   ctx.translate(W/2,H/2);
+   if(land)ctx.rotate(-Math.PI/2);
+   ctx.scale(k,k);
+   const[sl,st,sw3,sh3]=m.s;
+   if(opts.img){
+     const landImg=land;
+     const dw=landImg?sh3:sw3, dh=landImg?sw3:sh3;
+     const[cxp,cyp,cw,chh]=coverRect(opts.iw,opts.ih,dw,dh);
+     ctx.save();
+     ctx.translate(-hw+sl+sw3/2, -hh+st+sh3/2);
+     rr(ctx,-sw3/2,-sh3/2,sw3,sh3,m.r);
+     ctx.clip();
+     if(landImg)ctx.rotate(Math.PI/2);
+     ctx.drawImage(opts.img,cxp,cyp,cw,chh,-dw/2,-dh/2,dw,dh);
+     ctx.restore();
+   }
+   ctx.save();
+   if(opts.shadow){ctx.shadowColor='rgba(0,0,0,.42)';ctx.shadowBlur=m.w*.016;ctx.shadowOffsetY=m.w*.008;}
+   ctx.drawImage(fi,-hw,-hh,m.w,m.h);
+   ctx.restore();
+   ctx.restore();
+   return;
+ }
+ const[bW,bH]=bodySize(d);
+ const margin=opts.shadow?24:12;
  ctx.save();
  ctx.translate(W/2,H/2);
- if(land)ctx.rotate(Math.PI/2);
+ if(land)ctx.rotate(-Math.PI/2);
  ctx.scale(k,k);                         // pt -> canvas px
  const x0=-bW/2,y0=-bH/2;
  // side buttons (peek out of the body silhouette)
@@ -624,13 +671,21 @@ const stage=$('stage');
 function scenePad(shadowOn){return shadowOn?34:8;}   // room for side buttons (+ shadow spread)
 function renderPreview(){
  if(!state.img)return;
- const dpr=Math.min(window.devicePixelRatio||1,2);
  const d=state.dev;
- const[aW,aH]=bodySize(d);
- const land=state.landscape&&d.frame!=='mac';
+ if(d.engine==='photo'&&!frameCache[d.colors[state.ci].f]){
+   const key=d.colors[state.ci].f; pendingFrameKey=key;
+   loadFrame(key,im=>{ if(pendingFrameKey===key&&im) renderPreview(); });
+   return;
+ }
+ const dpr=Math.min(window.devicePixelRatio||1,2);
  const shadowOn=state.shadow&&state.bg!=='transparent';
- const pad=scenePad(shadowOn);
- const vW=(land?aH:aW)+pad*2,vH=(land?aW:aH)+pad*2;
+ const photo=d.engine==='photo';
+ const man=photo?FRAME_MAN[d.colors[state.ci].f]:null;
+ const[aW0,aH0]=photo?[man.w,man.h]:bodySize(d);
+ const pad=photo?(shadowOn?Math.round(aW0*.035):Math.round(aW0*.012)):scenePad(shadowOn);
+ const aW=aW0+pad*2,aH=aH0+pad*2;
+ const land=state.landscape&&d.frame!=='mac';
+ const vW=land?aH:aW,vH=land?aW:aH;
  const cardW=$('stageCard').clientWidth-36;
  const maxW=Math.max(200,Math.min(cardW,680)),maxH=Math.min(window.innerHeight*.72,860);
  const k=Math.min(maxW/vW,maxH/vH);
@@ -638,7 +693,9 @@ function renderPreview(){
  stage.style.display='block';
  stage.style.width=cssW+'px';stage.style.height=cssH+'px';
  stage.width=Math.max(2,Math.round(cssW*dpr));stage.height=Math.max(2,Math.round(cssH*dpr));
- drawScene(stage.getContext('2d'),stage.width,stage.height,k*dpr,{dev:d,ci:state.ci,img:state.img,iw:state.iw,ih:state.ih,bg:state.bg,shadow:shadowOn,landscape:state.landscape,pad});
+ const o={dev:d,ci:state.ci,img:state.img,iw:state.iw,ih:state.ih,bg:state.bg,shadow:shadowOn,landscape:state.landscape,pad};
+ if(photo){o.photo={img:frameCache[d.colors[state.ci].f],man};}
+ drawScene(stage.getContext('2d'),stage.width,stage.height,k*dpr,o);
  $('stageActs').hidden=false;
  $('demoBtn0').hidden=true;
  $('drop').style.display='none';
@@ -738,15 +795,22 @@ function applyImage(img,w,h){
 /* ---------- export ---------- */
 function exportCanvas(){
  const d=state.dev;
- const[aW,aH]=bodySize(d);
- const land=state.landscape&&d.frame!=='mac';
- const g=geom(d);
+ const photo=d.engine==='photo';
+ const man=photo?FRAME_MAN[d.colors[state.ci].f]:null;
  const shadowOn=state.shadow&&state.bg!=='transparent';
- const pad=scenePad(shadowOn);
- const kk=(d.px[0]/g.sw)*(state.scale===2?2:1);   // native px per pt
+ const pad=photo?(shadowOn?Math.round(man.w*.035):Math.round(man.w*.012)):scenePad(shadowOn);
+ const[aW0,aH0]=photo?[man.w,man.h]:bodySize(d);
+ const land=state.landscape&&d.frame!=='mac';
+ const kk=photo?(state.scale===2?2:1):(d.px[0]/(d.sw||d.px[0]))*(state.scale===2?2:1); // photo: 帧原生 1×
  const cv=document.createElement('canvas');
- cv.width=Math.round(((land?aH:aW)+pad*2)*kk);cv.height=Math.round(((land?aW:aH)+pad*2)*kk);
- drawScene(cv.getContext('2d'),cv.width,cv.height,kk,{dev:d,ci:state.ci,img:state.img,iw:state.iw,ih:state.ih,bg:state.bg,shadow:shadowOn,landscape:state.landscape,pad});
+ cv.width=Math.round(((land?aH0:aW0)+pad*2)*kk);cv.height=Math.round(((land?aW0:aH0)+pad*2)*kk);
+ const o={dev:d,ci:state.ci,img:state.img,iw:state.iw,ih:state.ih,bg:state.bg,shadow:shadowOn,landscape:state.landscape,pad};
+ if(photo){
+   const fi=frameCache[d.colors[state.ci].f];
+   if(!fi)return null;                       // 帧未缓存（预览必已加载，防御）
+   o.photo={img:fi,man};
+ }
+ drawScene(cv.getContext('2d'),cv.width,cv.height,kk,o);
  return cv;
 }
 function download(){
